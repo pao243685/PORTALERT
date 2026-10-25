@@ -1,13 +1,15 @@
-import os
 from fastapi import FastAPI
-from sqlalchemy import create_engine, text
+from fastapi.middleware.cors import CORSMiddleware
+from app.core.config import FRONTEND_URL
+from app.routers import health
 
-engine = create_engine(os.environ["DATABASE_URL"])
 app = FastAPI(title="PortAlert API")
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[FRONTEND_URL],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-@app.get("/health")
-def health():
-    with engine.connect() as conn:
-        conn.execute(text("SELECT 1"))
-    return {"status": "ok", "db": "ok"}
+app.include_router(health.router)
