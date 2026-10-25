@@ -165,6 +165,9 @@ class Alert(Base):
     status: Mapped[AlertStatus] = mapped_column(
         AlertStatusType, default=AlertStatus.nueva, index=True
     )
+    confidence: Mapped[str] = mapped_column(
+        String(10), default="media", server_default="media"
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )
@@ -172,3 +175,15 @@ class Alert(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
     host: Mapped["Host"] = relationship(back_populates="alerts")
+
+class FileReputation(Base):
+    __tablename__ = "file_reputations"
+
+    sha256: Mapped[str] = mapped_column(String(64), primary_key=True)
+    status: Mapped[str] = mapped_column(String(12))
+    malicious: Mapped[int] = mapped_column(Integer, default=0)
+    suspicious: Mapped[int] = mapped_column(Integer, default=0)
+    total: Mapped[int] = mapped_column(Integer, default=0)
+    checked_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
